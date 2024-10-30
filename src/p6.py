@@ -13,6 +13,7 @@ import sys
 import os
 
 from itertools import product
+from functools import partial
 from types import ModuleType
 from enum import Enum
 
@@ -119,7 +120,12 @@ def main(args:Namespace):
         for state in yield_parameter_space(args):
             future = exe.submit(module.main, *state)
             future.add_done_callback(
-                        lambda f: save_on_complete(f,state,thread_pool,fp)
+                        partial(
+                            save_on_complete,
+                            state=state,
+                            thread_pool=thread_pool,
+                            fp=fp
+                            )
                         )
             futures.append(future)
     
