@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "p6"
+version = "0.0.1a"
+authors = [
+  {name="Tom van der Wielen", email="tvdwln@gmail.com"},
+]
+description = "Pure Python Parallel Processed Parameter Perusal"
+readme = "README.md"
+requires = ">=python3.10"
+
