@@ -9,6 +9,7 @@ The main paradigms used in this script are:
 import importlib
 import typing
 import time
+import sys
 import os
 
 from itertools import product
@@ -84,19 +85,22 @@ def main(args:Namespace):
     """run a gridded parameter study on the main
     function in the <args.script>."""
     try:
-        mod = importlib.import_module(args.script)
+        mdir = os.getcwd()
+        sys.path.append(mdir)
+        module = importlib.import_module(args.script)
+        sys.path.remove(mdir)
     except ImportError as e:
         print(e.msg)
         print("did you prehaps add .py at the end of the filename?")
         return EXIT.NO_MODULE_NAMED_Y
 
-    assert mod
+    assert module
 
-    if not hasattr(mod, "main"):
-        print(f"no main function found in {mod.__name__}")
+    if not hasattr(module, "main"):
+        print(f"no main function found in {module.__name__}")
         return EXIT.NO_MAIN
 
-    parser, rtype = make_parser_for_main(mod)
+    parser, rtype = make_parser_for_main(module)
     args, _ = parser.parse_known_args()
     
     if os.path.exists("out.swp"):
@@ -113,7 +117,7 @@ def main(args:Namespace):
         futures = []
         print("starting task submission")
         for state in yield_parameter_space(args):
-            future = exe.submit(mod.main, *state)
+            future = exe.submit(module.main, *state)
             future.add_done_callback(
                         lambda f: save_on_complete(f,state,thread_pool,fp)
                         )
